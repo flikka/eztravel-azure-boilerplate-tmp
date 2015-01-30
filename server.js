@@ -1,34 +1,39 @@
-
-/**
- * Module dependencies.
- */
-
 var express = require('express')
-  , routes = require('./routes')
-  , user = require('./routes/user')
-  , http = require('http')
-  , path = require('path');
-
+  , http = require('http');
+  
 var app = express();
 
-app.configure(function(){
-  app.set('port', process.env.PORT || 3000);
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'jade');
-  app.use(express.favicon());
-  app.use(express.logger('dev'));
-  app.use(express.bodyParser());
-  app.use(express.methodOverride());
-  app.use(app.router);
-  app.use(express.static(path.join(__dirname, 'public')));
+app.use('/', express.static(__dirname + '/public'));
+app.set('port', process.env.PORT || 3000);
+
+
+
+app.get('/travels/currentuser/', function(req, res) {
+    // Obtain user info from somewhere?
+    res.send("kflik@statoil.com");
 });
 
-app.configure('development', function(){
-  app.use(express.errorHandler());
+app.get('/travels/user/:name', function(req, res) {
+    // Might as well skip the username as argument fetch from somewhere.
+    console.log("Trying to get travels for: " + req.params.name)
+    if (req.params.name == "kflik@statoil.com") {
+        res.json(
+            [
+            {"travelid": 12,"location":"Bergen-Odda", "type":"Taxi", 
+            "price":"2000", "start":"dødstidlig","slutt" : "lenge etterpå"},
+            {"travelid": 2,"location":"Odda-Fjorden", "type":"Taxi", 
+            "price":"23", "start":"seint","slutt" : "lenge etterpå"},
+            {"travelid": 3,"location":"Fjorden-Odda", "type":"Taxi", 
+            "price":"32", "start":"mørkt","slutt" : "lenge etterpå"},
+            {"travelid": 4,"location":"Odda-Bergen", "type":"Taxi", 
+            "price":"2010", "start":"natt","slutt" : "lenge etterpå"}
+            ]
+            );
+    }
+    else {
+        res.send("Who are you really?");
+    }
 });
-
-app.get('/', routes.index);
-app.get('/users', user.list);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
